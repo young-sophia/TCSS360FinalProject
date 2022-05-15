@@ -2,35 +2,36 @@ import javax.swing.*;
 import java.awt.*;
 
 class ImagePanel extends JFrame {
-    private final JPanel buttonPanel = new JPanel();
+    private final JPanel panel = new JPanel();
     Container con = getContentPane();
 
     public ImagePanel(){
 
         setTitle("Animal Trivia Game");
-        setSize(650,500);
+        setSize(728,550);
         setLocation(360,100);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
         setBackground();
         setVisible(true);
     }
 
 
     public void setBackground(){
-
-        JLabel background = new JLabel(new ImageIcon("src/Assets/test.jpeg"));
+        JLabel background = new JLabel(new ImageIcon("src/Assets/startMenuBkgrnd.jpg"));
         con.add(background);
         con.setLayout(new FlowLayout());
-        con.add(buttonPanel);
-
+        con.add(panel);
     }
 
-    public void setButton(JButton button){
-        Font but = new Font("Serif" , Font.ITALIC , 20);
-        button.setFont(but);
-        buttonPanel.add(button);
+    public void setButton(JButton theButton){
+        Font but = new Font("Courier New" , Font.PLAIN , 20);
+        theButton.setFont(but);
+        panel.add(theButton);
+        validate();
+    }
+    public void hideMenu() {
+        panel.removeAll();
         validate();
     }
 }

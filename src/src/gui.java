@@ -9,23 +9,13 @@ import java.io.IOException;
 
 public class gui {
     public static void main(String[] theArgs) {
-        JFrame frame = new JFrame("Animal Trivia Maze");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 1));
-
-        //JLabel contentPane = new JLabel();
-        //ImageIcon backgroundImage = new ImageIcon("src/Assets/test.jpeg");
-        //contentPane.setIcon( backgroundImage );
-        //contentPane.setLayout( new BorderLayout() );
+        ImagePanel panel = new ImagePanel();
 
         JButton newGame = new JButton("New Game");
         newGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("new game pressed");
+                startNewGame();
             }
         });
         JButton loadGame = new JButton("Load Game");
@@ -43,16 +33,12 @@ public class gui {
             }
         });
 
-        JLabel title = new JLabel("Animal Trivia Maze", SwingConstants.CENTER);
-        title.setFont(new Font("Comic Sans MS", Font.PLAIN, 36));
+        panel.setButton(newGame);
+        panel.setButton(loadGame);
+        panel.setButton(exit);
+    }
 
-        panel.add(newGame);
-        panel.add(loadGame);
-        panel.add(exit);
-
-        //frame.setContentPane( contentPane );
-        frame.getContentPane().add(BorderLayout.NORTH, title);
-        frame.getContentPane().add(BorderLayout.CENTER,panel);
-        frame.setVisible(true);
+    static void startNewGame() {
+        System.out.println("New Game Started!");
     }
 }

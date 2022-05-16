@@ -1,11 +1,17 @@
+package Model;
+
 import javax.swing.*;
 import java.awt.*;
-
-class ImagePanel extends JFrame {
+/**
+ * Custom JFrame class to set background images and menus
+ *
+ * @author Sophia Young
+ */
+class ImageFrame extends JFrame {
     private final JPanel panel = new JPanel();
     Container con = getContentPane();
 
-    public ImagePanel(){
+    public ImageFrame(){
 
         setTitle("Animal Trivia Game");
         setSize(728,550);

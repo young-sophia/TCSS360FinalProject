@@ -1,12 +1,18 @@
+package Model;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
-
+/**
+ * GUI class and main method for program
+ *
+ * @author Sophia Young
+ */
 public class gui {
     public static void main(String[] theArgs) {
-        ImagePanel panel = new ImagePanel();
+        ImageFrame frame = new ImageFrame();
         JButton newGame = new JButton("New Game");
         JButton loadGame = new JButton("Load Game");
         JButton exit = new JButton("Exit");
@@ -14,44 +20,44 @@ public class gui {
         newGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                panel.hideMenu();
+                frame.hideMenu();
                 JButton select = new JButton("Select Difficulty");
                 select.setEnabled(false);
                 JButton easy = new JButton("Easy");
                 JButton medium = new JButton("Medium");
                 JButton hard = new JButton("Hard");
                 JButton extreme = new JButton("Extreme");
-                panel.setButton(select);
-                panel.setButton(easy);
-                panel.setButton(medium);
-                panel.setButton(hard);
-                panel.setButton(extreme);
+                frame.setButton(select);
+                frame.setButton(easy);
+                frame.setButton(medium);
+                frame.setButton(hard);
+                frame.setButton(extreme);
                 easy.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         startNewGame(1);
-                        panel.setVisible(false);
+                        frame.setVisible(false);
                     }
                 });
                 medium.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         startNewGame(2);
-                        panel.setVisible(false);
+                        frame.setVisible(false);
                     }
                 });
                 hard.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         startNewGame(3);
-                        panel.setVisible(false);
+                        frame.setVisible(false);
                     }
                 });
                 extreme.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         startNewGame(4);
-                        panel.setVisible(false);
+                        frame.setVisible(false);
                     }
                 });
             }
@@ -68,9 +74,9 @@ public class gui {
                 System.exit(1);
             }
         });
-        panel.setButton(newGame);
-        panel.setButton(loadGame);
-        panel.setButton(exit);
+        frame.setButton(newGame);
+        frame.setButton(loadGame);
+        frame.setButton(exit);
     }
     static JPanel newGameMenu() {
         JPanel panel = new JPanel();
@@ -81,11 +87,46 @@ public class gui {
         return panel;
     }
     static void startNewGame(int theDifficulty) {
-        System.out.println("New Game Started!");
         JFrame gameFrame = new JFrame("Animal Trivia Maze");
+        gameFrame.setLayout(new FlowLayout());
+        JPanel gamePanel = new JPanel();
+        JPanel controlsPanel = new JPanel();
+        controlPanel(controlsPanel);
+        JLabel label = new JLabel();
+        switch (theDifficulty) {
+            case 1 -> label.setText("Easy Difficulty (5x5?)");
+            case 2 -> label.setText("Medium Difficulty (7x7?)");
+            case 3 -> label.setText("Hard Difficulty (10x10?)");
+            case 4 -> label.setText("Extreme Difficulty (15x15?)");
+        }
+        gamePanel.add(label);
+        gameFrame.add(gamePanel);
+        gameFrame.add(controlsPanel);
         gameFrame.setLocation(360,100);
         gameFrame.setSize(800, 800);
         gameFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         gameFrame.setVisible(true);
+    }
+    static void controlPanel(JPanel thePanel) {
+        JButton up = new JButton();
+        JButton down = new JButton();
+        JButton left = new JButton();
+        JButton right = new JButton();
+        up.setIcon(new ImageIcon("src/Assets/arrowUp.jpg"));
+        up.setMargin(new Insets(0, 0, 0, 0));
+        up.setBorder(null);
+        left.setIcon(new ImageIcon("src/Assets/arrowLeft.jpg"));
+        left.setMargin(new Insets(0, 0, 0, 0));
+        left.setBorder(null);
+        down.setIcon(new ImageIcon("src/Assets/arrowDown.jpg"));
+        down.setMargin(new Insets(0, 0, 0, 0));
+        down.setBorder(null);
+        right.setIcon(new ImageIcon("src/Assets/arrowRight.jpg"));
+        right.setMargin(new Insets(0, 0, 0, 0));
+        right.setBorder(null);
+        thePanel.add(up);
+        thePanel.add(down);
+        thePanel.add(left);
+        thePanel.add(right);
     }
 }

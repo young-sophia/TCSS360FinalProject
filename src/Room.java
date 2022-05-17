@@ -9,6 +9,14 @@ public class Room {
     private boolean mySouth;
     private boolean myWest;
     private boolean myEast;
+
+    //booleans for walls keep track of walls
+
+    private boolean NorthWall;
+    private boolean SouthWall;
+    private boolean EastWall;
+    private boolean WestWall;
+
     //other variables, Lava, Items,
 
     enum Direction{
@@ -18,7 +26,40 @@ public class Room {
         WEST
     }
 
+    public boolean isNorthWall() {
+        return NorthWall;
+    }
+
+    public void setNorthWall(boolean northWall) {
+        NorthWall = northWall;
+    }
+
+    public boolean isSouthWall() {
+        return SouthWall;
+    }
+
+    public void setSouthWall(boolean southWall) {
+        SouthWall = southWall;
+    }
+
+    public boolean isEastWall() {
+        return EastWall;
+    }
+
+    public void setEastWall(boolean eastWall) {
+        EastWall = eastWall;
+    }
+
+    public boolean isWestWall() {
+        return WestWall;
+    }
+
+    public void setWestWall(boolean westWall) {
+        WestWall = westWall;
+    }
+
     private Direction direction;
+
 
     public void setDirectionNorth(boolean theNorth){
         myNorth = theNorth;
@@ -47,6 +88,10 @@ public class Room {
     }
 
     public Room() {
+        EastWall = true;
+        WestWall = true;
+        SouthWall = true;
+        NorthWall = true;
         myVisited = false;
     }
 

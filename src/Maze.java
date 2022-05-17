@@ -1,7 +1,8 @@
 public class Maze {
-    private Room[][] myMaze;
-    private int myRows;
-    private int myColumns;
+    private final Room[][] myMaze;
+    private final int myRows;
+    private final int myColumns;
+    private char[][] myArrayMaze;
 
     public Maze(final int theRows, final int theColumns){
         myRows = theRows;
@@ -11,14 +12,16 @@ public class Maze {
     }
 
     public static void main(String[] args){
-        Maze maze = new Maze(5,5);
+        Maze maze = new Maze(3,3);
 
 //        int[] arr = {0,-1,2,-1};
 //        arr = maze.checkNeighbors(0,0);
 //        maze.testConverArray(arr);
         maze.GenerateMaze();
-        maze.display();
+        maze.convertMazeToLarger();
+        System.out.println();
 //        System.out.println(maze.chooseDirection(0,0) + " >>>");
+        maze.display();
 
 
     }
@@ -72,14 +75,10 @@ public class Maze {
         }
 
         return arr;
-        //return array [T,F,T,F] containing directions valid.
+        //return array [0,-1,2,-1] containing directions valid.
     }
 
-    public void testConverArray(int[] arr){
 
-        int x = convertArray(arr);
-        System.out.println(x);
-    }
 
     public int convertArray(int[] arr){
         int spot = 0;
@@ -184,21 +183,47 @@ public class Maze {
 
         if(direction == 0){
             myMaze[x - 1][y].setVisited(true);
+            myMaze[x][y].setNorthWall(false);
+            myMaze[x-1][y].setSouthWall(false);
+
             create(x - 1, y);
+
         }
         else if(direction == 1){
             myMaze[x][y-1].setVisited(true);
+            myMaze[x][y].setWestWall(false);
+            myMaze[x][y-1].setEastWall(false);
+
             create(x, y-1);
+
         }
         else if(direction == 2){
             myMaze[x+1][y].setVisited(true);
+            myMaze[x][y].setSouthWall(false);
+            myMaze[x+1][y].setNorthWall(false);
+
             create(x+1,y);
+
         }
         else if(direction == 3){
             myMaze[x][y+1].setVisited(true);
-            create(x,y+1);
-        }
+            myMaze[x][y].setEastWall(false);
+            myMaze[x][y+1].setWestWall(false);
 
+            create(x,y+1);
+
+        }
+        arr = checkNeighbors(x,y);
+        boolean flag = false;
+        for(int i = 0 ; i < arr.length; i++){
+            if(arr[i] >-1){
+                flag = true;
+                break;
+            }
+        }
+        if(flag == true){
+            create(x,y);
+        }
 //        //N
 //            if ((x - 1 >= 0 && x - 1 < myRows) && myMaze[x - 1][y].Visited() != true) {
 //                myMaze[x - 1][y].setVisited(true);
@@ -227,6 +252,66 @@ public class Maze {
             for (int j = 0; j < myColumns; j++){
                 System.out.println(">>" +myMaze[i][j].Visited() + " :" + i + " " + j );
             }
+        }
+    }
+
+    public void convertMazeToLarger(){
+        myArrayMaze = new char[myRows*3 -( myRows-1)][myColumns*3 -(myColumns-1)];
+        for(int i = 0; i < myColumns; i++){
+            myArrayMaze[0][myColumns-1] = 'W';
+        }
+        for(int i = 0; i < myArrayMaze.length;i++){
+            //left column
+            myArrayMaze[i][0] = 'W';
+            //bottom row
+            myArrayMaze[myArrayMaze.length-1][i] = 'W';
+            //top row
+            myArrayMaze[0][i] = 'W';
+            //right column
+            myArrayMaze[i][myArrayMaze.length-1] = 'W';
+        }
+        //
+        //
+        int row = 0;
+        int col = 0;
+        for (int i = 1; row < myRows; i+=2) {
+            for (int j = 1; col < myColumns; j += 2) {
+                //9 spots should be used for a room
+                //top North
+                myArrayMaze[i][j] = 'R';
+                if (myMaze[row][col].isNorthWall()) {
+                    myArrayMaze[i - 1][j] = 'W';
+                } else {
+                    myArrayMaze[i - 1][j] = 'D';
+                }
+                if (myMaze[row][col].isWestWall()) {
+                    myArrayMaze[i][j - 1] = 'W';
+                } else {
+                    myArrayMaze[i][j - 1] = 'D';
+                }
+                if (myMaze[row][col].isEastWall()) {
+                    myArrayMaze[i][j + 1] = 'W';
+                } else {
+                    myArrayMaze[i][j + 1] = 'D';
+                }
+                if (myMaze[row][col].isSouthWall()) {
+                    myArrayMaze[i + 1][j] = 'W';
+                } else {
+                    myArrayMaze[i + 1][j] = 'D';
+
+                }
+                col++;
+            }
+            col = 0;
+            row++;
+
+        }
+
+        for(int i = 0; i < myArrayMaze.length; i++){
+            for(int j = 0; j < myArrayMaze[i].length; j++){
+                System.out.print(myArrayMaze[i][j] + " ");
+            }
+            System.out.println();
         }
     }
     /*

@@ -1,3 +1,5 @@
+package Model;
+
 import java.math.BigDecimal;
 
 /**
@@ -17,6 +19,17 @@ public class Room {
     private boolean EastWall;
     private boolean WestWall;
 
+    private boolean myExit;
+
+    private boolean mySpawn;
+
+    public boolean isMySpawn() {
+        return mySpawn;
+    }
+
+    public void setMySpawn(boolean mySpawn) {
+        this.mySpawn = mySpawn;
+    }
     //other variables, Lava, Items,
 
     enum Direction{
@@ -26,6 +39,13 @@ public class Room {
         WEST
     }
 
+    public boolean getMyExit(){
+        return myExit;
+    }
+
+    public void setMyExit(boolean theBool){
+        myExit = theBool;
+    }
     public boolean isNorthWall() {
         return NorthWall;
     }

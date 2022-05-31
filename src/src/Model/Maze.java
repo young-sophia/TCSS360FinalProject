@@ -1,4 +1,4 @@
-package Controller;
+package Model;
 
 import View.gui;
 
@@ -8,6 +8,7 @@ public class Maze {
     private final int myColumns;
     private char[][] myArrayMaze;
     private gui.Difficulty myDiff;
+    private int mySpawn;
 
     public Maze(final int theRows, final int theColumns){
         myRows = theRows;
@@ -47,6 +48,52 @@ public class Maze {
     public void setDiff(gui.Difficulty theDiff) {
         myDiff = theDiff;
     }
+
+    private void setExit(){
+        /*
+        0,0 : 0,5 : 5,0 : 5,5. These corners need to be checked
+        int distance = call getDistance method
+        check distance and see if its valid.
+        if true then set exit at spot. If not move to the next spot and recheck.
+         */
+        //0,0
+        int distance = getDistance(0,0);
+        if(checkDistance(distance)){
+            System.out.println("333");
+            myMaze[0][0].setMyExit(true);
+        }
+        else{
+            distance = getDistance(0,4);
+            myMaze[0][4].setMyExit(true);
+        }
+    }
+
+
+
+    /**
+     * check if distance is far enough from user spawn.
+     */
+    private boolean checkDistance(int theDistance){
+        if(theDistance > 2){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    /**
+     * This method uses the manhattan distance formula to calculate distance between spawn and exit.
+     * @param theRow
+     * @param theColumn
+     */
+    private int getDistance(int theRow, int theColumn){
+        //return formula distance
+        int dist = Math.abs(mySpawn - theRow) + Math.abs(mySpawn - theColumn);
+        return dist;
+
+    }
+
     private void setBlankMaze(int theRows, int theColumns){
         for(int i = 0; i < theRows; i++){
             for(int j = 0; j < theColumns; j++){
@@ -188,14 +235,14 @@ public class Maze {
 
         return result;
     }
-    public void GenerateMaze(){
-        int rand = (int) (Math.random()*myRows);
-        //int rand2 = (int) (Math.random()*myColumns);
+    public void generateMaze(){
+        mySpawn = (int) (Math.random()*myRows);
 
         int direction = (int) (Math.random() * 3);
-        myMaze[rand][rand].setVisited(true);
-
-        create(rand,rand);
+        myMaze[mySpawn][mySpawn].setVisited(true);
+        myMaze[mySpawn][mySpawn].setMySpawn(true);
+        create(mySpawn,mySpawn);
+        setExit();
     }
 
     public void create(int x, int y){
@@ -246,26 +293,6 @@ public class Maze {
         if(flag == true){
             create(x,y);
         }
-//        //N
-//            if ((x - 1 >= 0 && x - 1 < myRows) && myMaze[x - 1][y].Visited() != true) {
-//                myMaze[x - 1][y].setVisited(true);
-//                create(x - 1, y);
-//            }
-//        //W
-//            if ((y - 1 >= 0 && y - 1 < myColumns) && myMaze[x][y - 1].Visited() != true) {
-//                myMaze[x][y - 1].setVisited(true);
-//                create(x, y - 1);
-//            }
-//            //S
-//            if ((x + 1 >= 0 && x + 1 < myRows) && (myMaze[x + 1][y].Visited() != true)) {
-//                myMaze[x + 1][y].setVisited(true);
-//                create(x + 1, y);
-//            }
-//            //E
-//            if ((y + 1 >= 0 && y + 1 < myColumns) && (myMaze[x][y + 1].Visited() != true)) {
-//                myMaze[x][y + 1].setVisited(true);
-//                create(x, y + 1);
-//            }
     }
 
 
@@ -301,6 +328,9 @@ public class Maze {
                 //9 spots should be used for a room
                 //top North
                 myArrayMaze[i][j] = 'R';
+                if(myArrayMaze[i][j] == 'S'){
+                    myArrayMaze[i][j] = 'S';
+                }
                 if (myMaze[row][col].isNorthWall()) {
                     myArrayMaze[i - 1][j] = 'W';
                 } else {
@@ -321,6 +351,12 @@ public class Maze {
                 } else {
                     myArrayMaze[i + 1][j] = 'D';
 
+                }
+                if(myMaze[row][col].isMySpawn()){
+                    myArrayMaze[i][j] = 'S';
+                }
+                if(myMaze[row][col].getMyExit()){
+                    myArrayMaze[i][j] = 'E';
                 }
                 col++;
             }

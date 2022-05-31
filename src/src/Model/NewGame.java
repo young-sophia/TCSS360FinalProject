@@ -1,6 +1,5 @@
 package Model;
 
-import Controller.Maze;
 import View.gui;
 
 public class NewGame {

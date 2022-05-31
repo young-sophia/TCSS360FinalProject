@@ -1,6 +1,6 @@
 package View;
 
-import Controller.Maze;
+import Model.Maze;
 
 import javax.swing.*;
 import java.awt.*;
@@ -104,7 +104,7 @@ public class gui {
         JPanel controlsPanel = new JPanel();
         setupControlPanel(controlsPanel);
         Maze maze = new Maze(5, 5);;
-        maze.GenerateMaze();
+        maze.generateMaze();
         maze.convertMazeToLarger();
         switch (diff) {
             case EASY -> {

@@ -163,16 +163,22 @@ public class gui {
                 JLabel background;
                 if (room == 'W') {
                     background = new JLabel(new ImageIcon
-                            ("src/Assets/wallTEMP.jpg"));
+                            ("src/Assets/wall.jpg"));
                 } else if (room == 'R') {
                     background = new JLabel(new ImageIcon
-                            ("src/Assets/roomTEMP.jpg"));
+                            ("src/Assets/room.jpg"));
                 } else if (room == 'D') {
                     background = new JLabel(new ImageIcon
                             ("src/Assets/doorTEMP.jpg"));
+                } else if (room == 'E') {
+                    background = new JLabel(new ImageIcon
+                            ("src/Assets/exit.jpg"));
+                } else if (room == 'S') {
+                    background = new JLabel(new ImageIcon
+                            ("src/Assets/enter.jpg"));
                 } else {
                     background = new JLabel(new ImageIcon
-                            ("src/Assets/wallTEMP.jpg"));
+                            ("src/Assets/wall.jpg"));
                 }
                 //System.out.print(room + " ");
                 thePanel.add(background);

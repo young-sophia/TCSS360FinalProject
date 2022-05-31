@@ -16,22 +16,7 @@ public class Maze {
         myMaze = new Room[theRows][theColumns];
         setBlankMaze(theRows, theColumns);
     }
-    /*
-    public static void main(String[] args){
-        Maze maze = new Maze(3,3);
 
-//        int[] arr = {0,-1,2,-1};
-//        arr = maze.checkNeighbors(0,0);
-//        maze.testConverArray(arr);
-        maze.GenerateMaze();
-        maze.convertMazeToLarger();
-        System.out.println();
-//        System.out.println(maze.chooseDirection(0,0) + " >>>");
-        maze.display();
-
-
-    }
-    */
     public char getRoomType(int i, int j) {
         return myArrayMaze[i][j];
     }
@@ -154,10 +139,10 @@ public class Maze {
         int direction = -1;
         int[] arr2 = new int[4];
         int counter = 0;
-        for(int i = 0; i < arr.length; i++){
-            if(arr[i] >= 0){
+        for (int j : arr) {
+            if (j >= 0) {
                 counter++;
-                arr2[spot] = arr[i];
+                arr2[spot] = j;
                 spot++;
             }
             //arr2 = 0,2
@@ -372,14 +357,5 @@ public class Maze {
             System.out.println();
         }
     }
-    /*
-    first pass in the spawn spot.
-    method(int x, int y){
-        if statements
-        * if above spot is valid,then move up x-1.make visted true for spot, and recursive call the method with method(x-1, y);
-        * if other statements
-        ;
-    }
-     */
 
 }

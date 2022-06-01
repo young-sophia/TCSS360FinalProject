@@ -102,6 +102,7 @@ public class gui {
         gamePanel.setLayout(new GridLayout(11, 11));
 
         JPanel controlsPanel = new JPanel();
+        controlsPanel.setLayout(new GridLayout(2, 3));
         setupControlPanel(controlsPanel);
         Maze maze = new Maze(5, 5);;
         maze.generateMaze();
@@ -133,6 +134,8 @@ public class gui {
         JButton down = new JButton();
         JButton left = new JButton();
         JButton right = new JButton();
+        JLabel blank = new JLabel(new ImageIcon("src/Assets/blank.jpg"));
+        JLabel blank2 = new JLabel(new ImageIcon("src/Assets/blank.jpg"));
         up.setIcon(new ImageIcon("src/Assets/arrowUp.jpg"));
         up.setMargin(new Insets(0, 0, 0, 0));
         up.setBorder(null);
@@ -151,9 +154,11 @@ public class gui {
                 System.out.println("Up Pressed");
             }
         });
+        thePanel.add(blank);
         thePanel.add(up);
-        thePanel.add(down);
+        thePanel.add(blank2);
         thePanel.add(left);
+        thePanel.add(down);
         thePanel.add(right);
     }
     static void setupMaze(Maze theMaze, JPanel thePanel) {

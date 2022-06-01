@@ -304,8 +304,6 @@ public class Maze {
             //right column
             myArrayMaze[i][myArrayMaze.length-1] = 'W';
         }
-        //
-        //
         int row = 0;
         int col = 0;
         for (int i = 1; row < myRows; i+=2) {
@@ -347,9 +345,7 @@ public class Maze {
             }
             col = 0;
             row++;
-
         }
-
         for(int i = 0; i < myArrayMaze.length; i++){
             for(int j = 0; j < myArrayMaze[i].length; j++){
                 System.out.print(myArrayMaze[i][j] + " ");
@@ -357,5 +353,4 @@ public class Maze {
             System.out.println();
         }
     }
-
 }

@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
+import static Model.UserFunctionality.Difficulty;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 /**
  * GUI class and main method for program
@@ -212,8 +213,5 @@ public class gui {
             }
             //System.out.println();
         }
-    }
-    public enum Difficulty {
-        EASY, MEDIUM, HARD, EXTREME
     }
 }

@@ -14,6 +14,10 @@ public class UserFunctionality {
 
     }
 
+    public enum Difficulty {
+        EASY, MEDIUM, HARD, EXTREME
+    }
+
     //method to display directions to move
 
 

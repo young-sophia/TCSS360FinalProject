@@ -1,13 +1,11 @@
 package Model;
 
-import View.gui;
-
 public class Maze {
     private final Room[][] myMaze;
     private final int myRows;
     private final int myColumns;
     private char[][] myArrayMaze;
-    private gui.Difficulty myDiff;
+    private UserFunctionality.Difficulty myDiff;
     private int mySpawn;
 
     public Maze(final int theRows, final int theColumns){
@@ -20,7 +18,7 @@ public class Maze {
     public char getRoomType(int i, int j) {
         return myArrayMaze[i][j];
     }
-    public gui.Difficulty getDiff() {
+    public UserFunctionality.Difficulty getDiff() {
         return myDiff;
     }
     public int getRows() {
@@ -30,7 +28,7 @@ public class Maze {
         return myArrayMaze.length;
     }
 
-    public void setDiff(gui.Difficulty theDiff) {
+    public void setDiff(UserFunctionality.Difficulty theDiff) {
         myDiff = theDiff;
     }
 

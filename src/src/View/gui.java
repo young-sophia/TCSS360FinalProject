@@ -2,10 +2,13 @@ package View;
 
 import Model.Maze;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 /**
@@ -15,7 +18,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
  */
 public class gui {
 
-    public static void main(String[] theArgs) {
+    public static void main(String[] theArgs) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         ImageFrame frame = new ImageFrame();
         JButton newGame = new JButton("New Game");
         JButton loadGame = new JButton("Load Game");
@@ -79,10 +82,29 @@ public class gui {
                 System.exit(1);
             }
         });
+        playMusic();
         frame.setButton(newGame);
         frame.setButton(loadGame);
         frame.setButton(exit);
     }
+
+    private static void playMusic() {
+        try {
+            File music = new File("src/Assets/City Blocks - TrackTribe.wav");
+            if(music.exists()) {
+                AudioInputStream audioInput = AudioSystem.getAudioInputStream(music);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioInput);
+                clip.start();
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+            } else {
+                System.out.println("error");
+            }
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     static JPanel newGameMenu() {
         JPanel panel = new JPanel();
         String[] diff = { "Easy", "Medium", "Hard", "Extreme"};

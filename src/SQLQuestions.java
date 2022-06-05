@@ -1,80 +1,131 @@
 package Model;
-
 import org.sqlite.SQLiteDataSource;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 
 public class SQLQuestions {
-    private static final ArrayList<Question> questionList = new ArrayList<>();
-    private static final ArrayList<String> answerList = new ArrayList<>();
+    public  final ArrayList<Question> questionList = new ArrayList<>();
+    private static Question obj = null;
+    private static final Random rand = new Random();
+    private static String[] choice;
+    private static String correctAns;
+
+
     public static void main( String args[] ) {
 
-//        Statement stmt = null;
-//        SQLiteDataSource ds = new SQLiteDataSource();
-//        ds.setUrl("jdbc:sqlite:Questions.db");
-//
-//        String sql2 = "SELECT * FROM QA";
-//
-//        try {
-//            Connection c = ds.getConnection();
-//            stmt = c.createStatement();
-////            String sql = "CREATE TABLE QA " +
-////                    " (Questions           TEXT    NOT NULL, " +
-////                    " Answers           TEXT    NOT NULL) ";
-//
-//            System.out.println("Connected.");
-//
-//            ResultSet rs = stmt.executeQuery(sql2);
-//            while(rs.next()){
-//                int diff = rs.getInt("Difficulty");
-//                String ques = rs.getString("Questions");
-//                String Ans = rs.getString("Answers");
-////                questionList.add(ques);
-//                answerList.add(Ans);
-//                    questionList.add(new Question(diff, ques, Ans));
-//
-//
-//            }
-//            rs.close();
-//            stmt.close();
-//            c.close();
-//
-//        }catch ( Exception e ) {
-//            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-//            System.exit(0);
-//        }
-        for(int i = 0; i < 5; i++) {
-            System.out.println(selectDiff(2));
-        }
-        System.out.println("operation done");
+//        selectDiff(1);
+//        multQuestion();
+
     }
-    public static Question selectDiff(final int theDifficulty){
-        Random ran = new Random();
+    public Question selectDiff(final int theDifficulty){
+
         String sql = "SELECT * FROM QA WHERE Difficulty = ?";
         SQLiteDataSource ds = new SQLiteDataSource();
         ds.setUrl("jdbc:sqlite:Questions.db");
         try {
             Connection conn = ds.getConnection();
             PreparedStatement pstmt  = conn.prepareStatement(sql);
-            // set the value
             pstmt.setInt(1,theDifficulty);
-            //
             ResultSet rs  = pstmt.executeQuery();
 
-            // loop through the result set
             while (rs.next()) {
                 int diff = rs.getInt("Difficulty");
                 String ques = rs.getString("Questions");
                 String Ans = rs.getString("Answers");
-                questionList.add(new Question(diff, ques, Ans));
+                int type = rs.getInt("Valid");
+                obj = new Question(diff, ques, Ans, type);
+                questionList.add(obj);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return questionList.get(ran.nextInt(questionList.size()));
+        int val = rand.nextInt(questionList.size());
+
+        return questionList.get(val);
     }
+
+    public Question getterQuestionList(){
+        int randVal = rand.nextInt(questionList.size());
+        Question question = questionList.get(randVal);
+        return question;
+    }
+
+    public void removeQuestion(int theValue){
+        questionList.remove(theValue);
+
+    }
+
+
+    public int getRandomvalue(){
+        if(!questionList.isEmpty()){
+            int randVal = rand.nextInt(questionList.size());
+            return randVal;
+        }
+        else{
+            return 0;
+        }
+    }
+
+    public int getType(int theValue){
+        theValue = questionList.get(theValue).getMyType();
+        return theValue;
+    }
+    public String getAnswer(int theValue){
+        String answer = questionList.get(theValue).getMyAnswer();
+        return answer;
+    }
+
+
+    public String getQuestion(int theValue){
+        String question = questionList.get(theValue).getMyQuestion();
+        return question;
+    }
+
+    public void multQuestion() {
+        Scanner scanner = new Scanner(System.in);
+        int randVal = rand.nextInt(questionList.size());
+        String question = questionList.get(randVal).getMyQuestion();
+        String ans = questionList.get(randVal).getMyAnswer();
+        choice = ans.split(", ");
+        correctAns = choice[0];
+        Collections.shuffle(Arrays.asList(choice));
+        System.out.println(question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
+                "\nC. " + choice[2] + "\nD. " + choice[3]);
+
+        System.out.println("Enter your choice:");
+        String choose = scanner.nextLine();
+        boolean correct = false;
+        if(choose.equalsIgnoreCase("A")){
+            if(choice[0].equals(correctAns)){
+                correct = true;
+            }
+        }
+        else if(choose.equalsIgnoreCase("B")){
+            if(choice[1].equals(correctAns)){
+                correct = true;
+            }
+        }
+        else if(choose.equalsIgnoreCase("C")){
+            if(choice[2].equals(correctAns)){
+                correct = true;
+            }
+        }
+        else if(choose.equalsIgnoreCase("D")){
+            if(choice[3].equals(correctAns)){
+                correct = true;
+            }
+        }
+        if(correct == true){
+            System.out.println("Correct Answer!");
+        }
+        else {
+            System.out.println("Wrong Answer");
+        }
+        questionList.remove(randVal);
+
+    }
+
 
 }

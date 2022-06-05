@@ -1,7 +1,5 @@
+
 package Model;
-
-import java.math.BigDecimal;
-
 /**
  * Function similar to edge
  */
@@ -22,6 +20,52 @@ public class Room {
     private boolean myExit;
 
     private boolean mySpawn;
+
+    public boolean isMyVisited() {
+        return myVisited;
+    }
+
+    public void setMyVisited(boolean myVisited) {
+        this.myVisited = myVisited;
+    }
+
+    public Door getMyQuestionNorth() {
+        return myQuestionNorth;
+    }
+
+    public void setMyQuestionNorth(Door myQuestionNorth) {
+        this.myQuestionNorth = myQuestionNorth;
+    }
+
+    public Door getMyQuestionWest() {
+        return myQuestionWest;
+    }
+
+    public void setMyQuestionWest(Door myQuestionWest) {
+        this.myQuestionWest = myQuestionWest;
+    }
+
+    public Door getMyQuestionSouth() {
+        return myQuestionSouth;
+    }
+
+    public void setMyQuestionSouth(Door myQuestionSouth) {
+        this.myQuestionSouth = myQuestionSouth;
+    }
+
+    public Door getMyQuestionEast() {
+        return myQuestionEast;
+    }
+
+    public void setMyQuestionEast(Door myQuestionEast) {
+        this.myQuestionEast = myQuestionEast;
+    }
+
+    private Door myQuestionNorth;
+    private Door myQuestionWest;
+    private Door myQuestionSouth;
+    private Door myQuestionEast;
+
 
     public boolean isMySpawn() {
         return mySpawn;
@@ -78,7 +122,6 @@ public class Room {
         WestWall = westWall;
     }
 
-    private Direction direction;
 
 
     public void setDirectionNorth(boolean theNorth){

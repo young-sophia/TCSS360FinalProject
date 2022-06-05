@@ -1,11 +1,25 @@
 package Model;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Random;
+import java.util.regex.Pattern;
+
 public class Maze {
     private Room[][] myMaze;
     private int myRows;
     private int myColumns;
     private char[][] myArrayMaze;
-    private int mySpawn;
+    private int mySpawnColMaze;
+    private int mySpawnRowMaze;
+    private int mySpawnColLargeMaze;
+    private int mySpawnRowLargeMaze;
+    private String correctAnswer;
+    private String[] choice;
+    private int rand;
+    SQLQuestions questions;
+
+
 
     public Maze(final int theRows, final int theColumns){
         myRows = theRows;
@@ -14,8 +28,67 @@ public class Maze {
         setBlankMaze(theRows, theColumns);
     }
 
+    public String getQuestion(){
+        rand = questions.getRandomvalue();
+        String question = questions.getQuestion(rand);
+        return question;
+    }
+
+    public String getAnswer(){
+        String answer = questions.getAnswer(rand);
+        return answer;
+
+    }
 
 
+    public void setQuestion() {
+        int random;
+        questions = new SQLQuestions();
+        questions.selectDiff(1);
+        System.out.println("<<<" +questions.questionList.size());
+        outer: for (int i = 0; i < myRows; i++) {
+            for (int j = 0; j < myColumns; j++) {
+                Random ran = new Random();
+                random = ran.nextInt(2)+1;
+
+                if (random == 1) {
+                    System.out.println(">>>>");
+                    if (!myMaze[i][j].isNorthWall()) {
+                        Door door = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
+                        myMaze[i][j].setMyQuestionNorth(door);
+                        questions.removeQuestion(rand);
+                        if(questions.questionList.size() == 0){
+                            break outer;
+                        }
+                    } if (!myMaze[i][j].isWestWall()) {
+                        Door door = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
+                        myMaze[i][j].setMyQuestionWest(door);
+                        questions.removeQuestion(rand);
+
+                        if(questions.questionList.size() == 0){
+                            break outer;
+                        }
+                    } if (!myMaze[i][j].isSouthWall()) {
+                        Door door = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
+                        myMaze[i][j].setMyQuestionSouth(door);
+                        questions.removeQuestion(rand);
+                        if(questions.questionList.size() == 0){
+                            break outer;
+                        }
+                    } if (!myMaze[i][j].isEastWall()) {
+                        Door door = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
+                        myMaze[i][j].setMyQuestionEast(door);
+                        questions.removeQuestion(rand);
+                        if(questions.questionList.size() == 0){
+                            break outer;
+                        }
+                    }
+                }
+                System.out.println(">>>" +questions.questionList.size());
+            }
+        }
+        //put in question
+    }
 
     private void setExit(){
         /*
@@ -35,9 +108,6 @@ public class Maze {
             myMaze[0][4].setMyExit(true);
         }
     }
-
-
-
     /**
      * check if distance is far enough from user spawn.
      */
@@ -49,7 +119,6 @@ public class Maze {
             return false;
         }
     }
-
     /**
      * This method uses the manhattan distance formula to calculate distance between spawn and exit.
      * @param theRow
@@ -57,7 +126,7 @@ public class Maze {
      */
     private int getDistance(int theRow, int theColumn){
         //return formula distance
-        int dist = Math.abs(mySpawn - theRow) + Math.abs(mySpawn - theColumn);
+        int dist = Math.abs(mySpawnRowMaze - theRow) + Math.abs(mySpawnColMaze - theColumn);
         return dist;
 
     }
@@ -204,12 +273,15 @@ public class Maze {
         return result;
     }
     public void generateMaze(){
-        mySpawn = (int) (Math.random()*myRows);
-
+        //set spawn points
+        mySpawnRowMaze = (int) (Math.random()*myRows);
+        mySpawnColMaze = mySpawnRowMaze;
+        mySpawnColLargeMaze = mySpawnColMaze*2+1;
+        mySpawnRowLargeMaze = mySpawnRowMaze*2+1;
         int direction = (int) (Math.random() * 3);
-        myMaze[mySpawn][mySpawn].setVisited(true);
-        myMaze[mySpawn][mySpawn].setMySpawn(true);
-        create(mySpawn,mySpawn);
+        myMaze[mySpawnRowMaze][mySpawnColMaze].setVisited(true);
+        myMaze[mySpawnRowMaze][mySpawnColMaze].setMySpawn(true);
+        create(mySpawnRowMaze,mySpawnColMaze);
         setExit();
     }
 
@@ -267,11 +339,54 @@ public class Maze {
     public void display(){
         for (int i = 0 ; i < myRows; i++){
             for (int j = 0; j < myColumns; j++){
-                System.out.println(">>" +myMaze[i][j].Visited() + " :" + i + " " + j );
+                System.out.println(myMaze[i][j] );
             }
         }
     }
 
+    public void displayDirections(){
+        if(!myMaze[mySpawnRowMaze][mySpawnColMaze].isSouthWall()){
+            System.out.println("Move down (D)");
+        }
+        if(!myMaze[mySpawnRowMaze][mySpawnColMaze].isEastWall()){
+            System.out.println("Move Right (R)");
+        }
+        if(!myMaze[mySpawnRowMaze][mySpawnColMaze].isNorthWall()){
+            System.out.println("Move Up (U)");
+        }
+        if(!myMaze[mySpawnRowMaze][mySpawnColMaze].isWestWall()){
+            System.out.println("Move Left (L)");
+        }
+    }
+
+    public boolean checkDirectionForUser(char theDirection){
+        boolean flag = true;
+        String direction = "" + theDirection;
+        if(theDirection == 'D' && myMaze[mySpawnRowMaze][mySpawnColMaze].isSouthWall()){
+            System.out.println("Invalid Direction, please re-enter.");
+            flag = false;
+        }
+        else if(theDirection == 'R' && myMaze[mySpawnRowMaze][mySpawnColMaze].isEastWall()){
+            System.out.println("Invalid Direction, please re-enter.");
+            flag = false;
+        }
+        else if(theDirection == 'U' && myMaze[mySpawnRowMaze][mySpawnColMaze].isNorthWall()){
+            System.out.println("Invalid Direction, please re-enter.");
+            flag = false;
+
+        }
+        else if(theDirection == 'L' && myMaze[mySpawnRowMaze][mySpawnColMaze].isWestWall()){
+            System.out.println("Invalid Direction, please re-enter.");
+            flag = false;
+
+        }
+        else if(Pattern.compile("UDLR").matcher(direction).matches()){
+            System.out.println("Invalid Direction, please re-enter.");
+            flag = false;
+        }
+        return flag;
+
+    }
     public void convertMazeToLarger(){
         myArrayMaze = new char[myRows*3 -( myRows-1)][myColumns*3 -(myColumns-1)];
         for(int i = 0; i < myColumns; i++){
@@ -296,8 +411,8 @@ public class Maze {
                 //9 spots should be used for a room
                 //top North
                 myArrayMaze[i][j] = 'R';
-                if(myArrayMaze[i][j] == 'S'){
-                    myArrayMaze[i][j] = 'S';
+                if(myArrayMaze[i][j] == 'P'){
+                    myArrayMaze[i][j] = 'P';
                 }
 
                 if (myMaze[row][col].isNorthWall()) {
@@ -322,7 +437,7 @@ public class Maze {
 
                 }
                 if(myMaze[row][col].isMySpawn()){
-                    myArrayMaze[i][j] = 'S';
+                    myArrayMaze[i][j] = 'P';
                 }
                 if(myMaze[row][col].getMyExit()){
                     myArrayMaze[i][j] = 'E';
@@ -341,8 +456,256 @@ public class Maze {
             System.out.println();
         }
     }
+    public char checkUserSpot(){
+        if(myMaze[mySpawnRowMaze][mySpawnColMaze].getMyExit() == myMaze[mySpawnRowMaze][mySpawnColMaze].isMySpawn()){
+            return 'Q';
+        }
+        else{
+            return 'C';
+        }
+    }
+
+    public void questionAnswered(char theDirection){
+        if(theDirection == 'U'){
+            myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionNorth().setMyQuestionAnswered(true);
+        }
+        else if(theDirection == 'D'){
+            myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionSouth().setMyQuestionAnswered(true);
+        }
+        else if(theDirection == 'L'){
+            myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionWest().setMyQuestionAnswered(true);
+        }
+        else{
+            myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionEast().setMyQuestionAnswered(true);
+        }
+    }
+
+    public boolean displayQuestion(char theDirection){
+        boolean flag = true;
+        if(theDirection == 'U'){
+            Door door = myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionNorth();
+            if(door != null && !door.myQuestionAnswered) {
+                flag = false;
+                if(door.getMyType() == 0) {
+                    String answer = door.getAnswer();
+                    choice = answer.split(", ");
+                    correctAnswer = choice[0];
+                    Collections.shuffle(Arrays.asList(choice));
+                    if (door.questionExist) {
+                        System.out.println(door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
+                                "\nC. " + choice[2] + "\nD. " + choice[3]);
+                    }
+                }
+                else if(door.getMyType() == 1 || door.getMyType() == 2){
+                    correctAnswer = door.getAnswer();
+                    if(door.questionExist){
+                        System.out.println(door.question);
+                    }
+                }
+
+            }
+        }
+        else if(theDirection == 'L' ){
+            Door door = myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionWest();
+            if(door != null && !door.myQuestionAnswered) {
+                flag = false;
+                if(door.getMyType() == 0) {
+                    String answer = door.getAnswer();
+                    choice = answer.split(", ");
+                    correctAnswer = choice[0];
+                    Collections.shuffle(Arrays.asList(choice));
+                    if (door.questionExist) {
+                        System.out.println(door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
+                                "\nC. " + choice[2] + "\nD. " + choice[3]);
+                    }
+                }
+                else if(door.getMyType() == 1 || door.getMyType() == 2){
+                    correctAnswer = door.getAnswer();
+                    if(door.questionExist){
+                        System.out.println(door.question);
+                    }
+
+                }
+            }
+        }
+        else if(theDirection == 'D'){
+            Door door = myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionSouth();
+            if(door != null && !door.myQuestionAnswered) {
+                flag = false;
+                if(door.getMyType() == 0) {
+                    String answer = door.getAnswer();
+                    choice = answer.split(", ");
+                    correctAnswer = choice[0];
+                    Collections.shuffle(Arrays.asList(choice));
+                    if (door.questionExist) {
+                        System.out.println(door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
+                                "\nC. " + choice[2] + "\nD. " + choice[3]);
+                    }
+                }
+                else if(door.getMyType() == 1 || door.getMyType() == 2){
+                    correctAnswer = door.getAnswer();
+                    if(door.questionExist){
+                        System.out.println(door.question);
+                    }
+
+                }
+            }
+        }
+        else if(theDirection == 'R'){
+            Door door = myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionEast();
+            if(door != null && !door.myQuestionAnswered) {
+                flag = false;
+                if(door.getMyType() == 0) {
+                    String answer = door.getAnswer();
+                    choice = answer.split(", ");
+                    correctAnswer = choice[0];
+                    Collections.shuffle(Arrays.asList(choice));
+                    if (door.questionExist) {
+                        System.out.println(door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
+                                "\nC. " + choice[2] + "\nD. " + choice[3]);
+                    }
+                }
+                else if(door.getMyType() == 1 || door.getMyType() == 2){
+                    correctAnswer = door.getAnswer();
+                    if(door.questionExist){
+                        System.out.println(door.question);
+                    }
+
+                }
+            }
+        }
+        return flag;
+    }
+
+    public int checkTypeQuestion(){
+        if(questions.getType(rand) == 0){
+            return 0;
+        }
+        else if(questions.getType(rand) == 1){
+            return 1;
+        }
+        else{
+            return 2;
+        }
+    }
+
+    public int checkTypeQuestionMaze(char theDirecton) {
+        if (theDirecton == 'U') {
+            if (myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionNorth().myType == 0) {
+                return 0;
+            } else if (myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionNorth().myType == 1) {
+                return 1;
+            } else {
+                return 2;
+            }
+        } else if (theDirecton == 'D') {
+            if (myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionSouth().myType == 0) {
+                return 0;
+            } else if (myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionSouth().myType == 1) {
+                return 1;
+            } else {
+                return 2;
+            }
+        } else if (theDirecton == 'L') {
+            if (myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionWest().myType == 0) {
+                return 0;
+            } else if (myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionWest().myType == 1) {
+                return 1;
+            } else {
+                return 2;
+            }
+        } else{
+            if (myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionEast().myType == 0) {
+                return 0;
+            } else if (myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionEast().myType == 1) {
+                return 1;
+            } else {
+                return 2;
+            }
+        }
+    }
+
+    public boolean shortAnswer(String theInput){
+        boolean flag = true;
+        if(!theInput.equalsIgnoreCase(correctAnswer)){
+            System.out.println("Incorrect Answer");
+            flag = false;
+        }
+        return flag;
+    }
 
 
+    public boolean answerMultipleChoice(char theAnswer){
+        boolean flag = true;
+        if(theAnswer == 'A'){
+            if(correctAnswer != choice[0]){
+                System.out.println("Incorrect Answer");
+                flag = false;
+            }
+        }
+        else if(theAnswer == 'B'){
+            if(correctAnswer != choice[1]){
+                System.out.println("Incorrect Answer");
+                flag = false;
+            }
+        }
+        else if(theAnswer == 'C'){
+            if(correctAnswer != choice[2]){
+                System.out.println("Incorrect Answer");
+                flag = false;
+            }
+        }
+        else if(theAnswer == 'D'){
+            if(correctAnswer != choice[3]){
+                System.out.println("Incorrect Answer");
+                flag = false;
+            }
+        }
+        return flag;
+
+    }
+    public void movePlayer(char theDirection){
+        if(theDirection == 'R'){
+            myArrayMaze[mySpawnRowLargeMaze][mySpawnColLargeMaze] = 'R';
+            myMaze[mySpawnRowMaze][mySpawnColMaze].setMySpawn(false);
+            //open question for door myArrayMaze[mySpawn][mySpawn-1]
+            myArrayMaze[mySpawnRowLargeMaze][mySpawnColLargeMaze+2] = 'P';
+            myMaze[mySpawnRowMaze][mySpawnColMaze+1].setMySpawn(true);
+            mySpawnColMaze+=1;
+            mySpawnColLargeMaze +=2;
+            System.out.println("Updated");
+        }
+        else if(theDirection == 'L'){
+            myArrayMaze[mySpawnRowLargeMaze][mySpawnColLargeMaze] = 'R';
+            myMaze[mySpawnRowMaze][mySpawnColMaze].setMySpawn(false);
+            //open question for door myArrayMaze[mySpawn][mySpawn-1]
+            myArrayMaze[mySpawnRowLargeMaze][mySpawnColLargeMaze-2] = 'P';
+            myMaze[mySpawnRowMaze][mySpawnColMaze-1].setMySpawn(true);
+            mySpawnColMaze-=1;
+            mySpawnColLargeMaze -=2;
+            System.out.println("Updated");
+        }
+        else if(theDirection == 'D'){
+            myArrayMaze[mySpawnRowLargeMaze][mySpawnColLargeMaze] = 'R';
+            myMaze[mySpawnRowMaze][mySpawnColMaze].setMySpawn(false);
+            //open question for door myArrayMaze[mySpawn][mySpawn-1]
+            myArrayMaze[mySpawnRowLargeMaze+2][mySpawnColLargeMaze] = 'P';
+            myMaze[mySpawnRowMaze+1][mySpawnColMaze].setMySpawn(true);
+            mySpawnRowMaze+=1;
+            mySpawnRowLargeMaze +=2;
+            System.out.println("Updated");
+        }
+        else if(theDirection == 'U'){
+            myArrayMaze[mySpawnRowLargeMaze][mySpawnColLargeMaze] = 'R';
+            myMaze[mySpawnRowMaze][mySpawnColMaze].setMySpawn(false);
+            //open question for door myArrayMaze[mySpawn][mySpawn-1]
+            myArrayMaze[mySpawnRowLargeMaze-2][mySpawnColLargeMaze] = 'P';
+            myMaze[mySpawnRowMaze-1][mySpawnColMaze].setMySpawn(true);
+            mySpawnRowMaze-=1;
+            mySpawnRowLargeMaze -=2;
+            System.out.println("Updated");
+        }
+    }
 
 
 }

@@ -1,9 +1,14 @@
 package Model;
 
-public class Maze {
-    private final Room[][] myMaze;
-    private final int myRows;
-    private final int myColumns;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class Maze implements Serializable {
+    private Room[][] myMaze;
+    private int myRows;
+    private int myColumns;
     private char[][] myArrayMaze;
     private UserFunctionality.Difficulty myDiff;
     private int mySpawn;
@@ -13,6 +18,26 @@ public class Maze {
         myColumns = theColumns;
         myMaze = new Room[theRows][theColumns];
         setBlankMaze(theRows, theColumns);
+    }
+
+    public void saveMaze(ObjectOutputStream theOut) throws IOException {
+        theOut.writeObject(myMaze);
+        theOut.writeObject(myRows);
+        theOut.writeObject(myColumns);
+        theOut.writeObject(myArrayMaze);
+        theOut.writeObject(myDiff);
+        theOut.writeObject(mySpawn);
+        theOut.flush();
+        theOut.close();
+        System.out.println("game saved");
+    }
+    public void loadMaze(ObjectInputStream theIn) throws IOException, ClassNotFoundException {
+        myMaze = (Room[][]) theIn.readObject();
+        myRows = (int) theIn.readObject();
+        myColumns = (int) theIn.readObject();
+        myArrayMaze = (char[][]) theIn.readObject();
+        myDiff = (UserFunctionality.Difficulty) theIn.readObject();
+        mySpawn = (int) theIn.readObject();
     }
 
     public char getRoomType(int i, int j) {

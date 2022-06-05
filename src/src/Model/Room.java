@@ -1,9 +1,11 @@
 package Model;
 
+import java.io.Serializable;
+
 /**
  * Function similar to edge
  */
-public class Room {
+public class Room implements Serializable {
     private boolean myVisited;
     private boolean myNorth;
     private boolean mySouth;

@@ -7,8 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 import static Model.UserFunctionality.Difficulty;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
@@ -18,6 +17,9 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
  * @author Sophia Young
  */
 public class gui {
+    static Maze myMaze;
+    static Clip myClip;
+    static JFrame myGameFrame;
 
     public static void main(String[] theArgs) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         ImageFrame frame = new ImageFrame();
@@ -73,8 +75,8 @@ public class gui {
         loadGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println
-                        ("load game pressed");
+                loadLastGame();
+                frame.setVisible(false);
             }
         });
         exit.addActionListener(new ActionListener() {
@@ -89,15 +91,25 @@ public class gui {
         frame.setButton(exit);
     }
 
+    private static void loadLastGame() {
+        try{
+            ObjectInputStream in=new ObjectInputStream(new FileInputStream("f.txt"));
+            myMaze = new Maze(5, 5);
+            myMaze.loadMaze(in);
+            in.close();
+            startNewGame(myMaze.getDiff());
+        }catch(Exception e){System.out.println(e);}
+    }
+
     private static void playMusic() {
         try {
             File music = new File("src/Assets/City Blocks - TrackTribe.wav");
             if(music.exists()) {
                 AudioInputStream audioInput = AudioSystem.getAudioInputStream(music);
-                Clip clip = AudioSystem.getClip();
-                clip.open(audioInput);
-                clip.start();
-                clip.loop(Clip.LOOP_CONTINUOUSLY);
+                myClip = AudioSystem.getClip();
+                myClip.open(audioInput);
+                myClip.start();
+                myClip.loop(Clip.LOOP_CONTINUOUSLY);
             } else {
                 System.out.println("error");
             }
@@ -105,58 +117,62 @@ public class gui {
             throw new RuntimeException(e);
         }
     }
-
-    static JPanel newGameMenu() {
-        JPanel panel = new JPanel();
-        String[] diff = { "Easy", "Medium", "Hard", "Extreme"};
-        JComboBox<String> chooseDifficulty = new JComboBox<String>(diff);
-        panel.add(new JLabel("Select Difficulty"));
-        panel.add(chooseDifficulty);
-        return panel;
+    private static void muteUnmute() {
+        if(myClip.isActive()) {
+            myClip.stop();
+        } else {
+            myClip.start();
+        }
     }
+
     static void startNewGame(Difficulty diff) {
-        JFrame gameFrame = new JFrame("Animal Trivia Maze");
-        gameFrame.setLayout(new FlowLayout());
-        gameFrame.setLocation(360,100);
-        gameFrame.setSize(1000, 800);
-        gameFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        myGameFrame = new JFrame("Animal Trivia Maze");
+        myGameFrame.setLayout(new GridBagLayout());
+        myGameFrame.setLocation(360,100);
+        myGameFrame.setSize(800, 600);
+        myGameFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         JPanel gamePanel = new JPanel();
         gamePanel.setLayout(new GridLayout(11, 11));
 
         JPanel controlsPanel = new JPanel();
-        controlsPanel.setLayout(new GridLayout(2, 3));
+        controlsPanel.setLayout(new GridLayout(3, 3));
         setupControlPanel(controlsPanel);
-        Maze maze = new Maze(5, 5);;
-        maze.generateMaze();
-        maze.convertMazeToLarger();
+        if(myMaze == null) {
+            myMaze = new Maze(5, 5);
+            myMaze.generateMaze();
+            myMaze.convertMazeToLarger();
+        }
         switch (diff) {
             case EASY -> {
-                maze.setDiff(Difficulty.EASY);
-                setupMaze(maze, gamePanel);
+                myMaze.setDiff(Difficulty.EASY);
+                setupMaze(myMaze, gamePanel);
             }
             case MEDIUM -> {
-                maze.setDiff(Difficulty.MEDIUM);
-                setupMaze(maze, gamePanel);
+                myMaze.setDiff(Difficulty.MEDIUM);
+                setupMaze(myMaze, gamePanel);
             }
             case HARD -> {
-                maze.setDiff(Difficulty.HARD);
-                setupMaze(maze, gamePanel);
+                myMaze.setDiff(Difficulty.HARD);
+                setupMaze(myMaze, gamePanel);
             }
             case EXTREME -> {
-                maze.setDiff(Difficulty.EXTREME);
-                setupMaze(maze, gamePanel);
+                myMaze.setDiff(Difficulty.EXTREME);
+                setupMaze(myMaze, gamePanel);
             }
         }
-        gameFrame.add(gamePanel);
-        gameFrame.add(controlsPanel);
-        gameFrame.setVisible(true);
+        myGameFrame.add(gamePanel);
+        myGameFrame.add(controlsPanel);
+        myGameFrame.setVisible(true);
     }
     static void setupControlPanel(JPanel thePanel) {
         JButton up = new JButton();
         JButton down = new JButton();
         JButton left = new JButton();
         JButton right = new JButton();
+        JButton save = new JButton("Save");
+        JButton load = new JButton("Load");
+        JButton mute = new JButton("Mute");
         JLabel blank = new JLabel(new ImageIcon("src/Assets/blank.jpg"));
         JLabel blank2 = new JLabel(new ImageIcon("src/Assets/blank.jpg"));
         up.setIcon(new ImageIcon("src/Assets/arrowUp.jpg"));
@@ -177,12 +193,57 @@ public class gui {
                 System.out.println("Up Pressed");
             }
         });
+        left.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Left Pressed");
+            }
+        });
+        right.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Right Pressed");
+            }
+        });
+        down.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Down Pressed");
+            }
+        });
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    FileOutputStream fout = new FileOutputStream("f.txt");
+                    ObjectOutputStream out=new ObjectOutputStream(fout);
+                    myMaze.saveMaze(out);
+                } catch(Exception ex){System.out.println("error saving");}
+            }
+        });
+        load.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                myGameFrame.setVisible(false);
+                loadLastGame();
+
+            }
+        });
+        mute.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                muteUnmute();
+            }
+        });
         thePanel.add(blank);
         thePanel.add(up);
         thePanel.add(blank2);
         thePanel.add(left);
         thePanel.add(down);
         thePanel.add(right);
+        thePanel.add(save);
+        thePanel.add(load);
+        thePanel.add(mute);
     }
     static void setupMaze(Maze theMaze, JPanel thePanel) {
         for (int i = 0; i < theMaze.getRows(); i++) {
@@ -208,10 +269,8 @@ public class gui {
                     background = new JLabel(new ImageIcon
                             ("src/Assets/wall.jpg"));
                 }
-                //System.out.print(room + " ");
                 thePanel.add(background);
             }
-            //System.out.println();
         }
     }
 }

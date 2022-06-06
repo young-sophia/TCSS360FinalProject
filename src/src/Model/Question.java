@@ -4,11 +4,17 @@ public class Question {
     private final String myQuestion;
     private final String myAnswer;
     private final int myDifficulty;
+    private final int myType;
 
-    public Question(final int theDifficulty, final String theQuestion, final String theAnswer){
+    public int getMyType() {
+        return myType;
+    }
+
+    public Question(final int theDifficulty, final String theQuestion, final String theAnswer, final int theType){
         myDifficulty = theDifficulty;
         myQuestion = theQuestion;
         myAnswer = theAnswer;
+        myType = theType;
     }
 
     public String getMyQuestion() {
@@ -23,10 +29,4 @@ public class Question {
         return myDifficulty;
     }
 
-    @Override
-    public String toString() {
-        return ("diff: "+this.getMyDifficulty()+
-                " question: "+ this.getMyQuestion() +
-                " answer: "+ this.getMyAnswer());
-    }
 }

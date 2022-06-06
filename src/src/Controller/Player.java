@@ -1,18 +1,38 @@
 package Controller;
 
-import java.awt.*;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-class Player {
-    ArrayList<Item> items = new ArrayList<Item>();
-    int health;
-    Point currentPosition;
+public class Player implements Serializable {
+    private int myHealth;
 
-    public Player() {
-        health = 10;
-        currentPosition = new Point(1, 1);
+    public Player(int theHealth) {
+        myHealth = theHealth;
     }
-    public void move(int theDirection) {
 
+    public int getMyHealth() {
+        return myHealth;
+    }
+
+    public void setMyHealth(int myHealth) {
+        this.myHealth = myHealth;
+    }
+
+    public void decreaseHealth(){
+        myHealth -=1;
+    }
+
+    public boolean alive(){
+        return myHealth != 0;
+    }
+
+    public void savePlayer(ObjectOutputStream theOut) throws IOException {
+        theOut.writeObject(myHealth);
+    }
+
+    public void loadPlayer(ObjectInputStream theIn) throws IOException, ClassNotFoundException {
+        myHealth = (int) theIn.readObject();
     }
 }

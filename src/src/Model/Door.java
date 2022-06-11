@@ -1,6 +1,8 @@
 package Model;
 
-public class Door {
+import java.io.Serializable;
+
+public class Door implements Serializable {
     String question;
     String answer;
     boolean questionExist;

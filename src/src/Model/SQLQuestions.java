@@ -2,24 +2,16 @@ package Model;
 
 import org.sqlite.SQLiteDataSource;
 
+import java.io.Serializable;
 import java.sql.*;
 import java.util.*;
 
-
-public class SQLQuestions {
+public class SQLQuestions implements Serializable {
     public static final ArrayList<Question> questionList = new ArrayList<>();
     private static Question obj = null;
     private static final Random rand = new Random();
     private static String[] choice;
     private static String correctAns;
-
-
-    public static void main( String args[] ) {
-
-        //selectDiff(1);
-        //multQuestion();
-
-    }
     public static Question selectDiff(final int theDifficulty){
 
         String sql = "SELECT * FROM QA WHERE Difficulty = ?";
@@ -30,7 +22,6 @@ public class SQLQuestions {
             PreparedStatement pstmt  = conn.prepareStatement(sql);
             pstmt.setInt(1,theDifficulty);
             ResultSet rs  = pstmt.executeQuery();
-
             while (rs.next()) {
                 int diff = rs.getInt("Difficulty");
                 String ques = rs.getString("Questions");
@@ -46,7 +37,6 @@ public class SQLQuestions {
 
         return questionList.get(val);
     }
-
     public Question getterQuestionList(){
         int randVal = rand.nextInt(questionList.size());
         Question question = questionList.get(randVal);
@@ -55,35 +45,25 @@ public class SQLQuestions {
 
     public void removeQuestion(int theValue){
         questionList.remove(theValue);
-
     }
-
-
     public int getRandomvalue(){
         if(!questionList.isEmpty()){
             int randVal = rand.nextInt(questionList.size());
             return randVal;
-        }
-        else{
+        } else {
             return 0;
         }
     }
-
     public int getType(int theValue){
         theValue = questionList.get(theValue).getMyType();
         return theValue;
     }
     public String getAnswer(int theValue){
-        String answer = questionList.get(theValue).getMyAnswer();
-        return answer;
+        return questionList.get(theValue).getMyAnswer();
     }
-
-
     public String getQuestion(int theValue){
-        String question = questionList.get(theValue).getMyQuestion();
-        return question;
+        return questionList.get(theValue).getMyQuestion();
     }
-
     public static void multQuestion() {
         Scanner scanner = new Scanner(System.in);
         int randVal = rand.nextInt(questionList.size());
@@ -94,7 +74,6 @@ public class SQLQuestions {
         Collections.shuffle(Arrays.asList(choice));
         System.out.println(question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
                 "\nC. " + choice[2] + "\nD. " + choice[3]);
-
         System.out.println("Enter your choice:");
         String choose = scanner.nextLine();
         boolean correct = false;
@@ -125,8 +104,5 @@ public class SQLQuestions {
             System.out.println("Wrong Answer");
         }
         questionList.remove(randVal);
-
     }
-
-
 }

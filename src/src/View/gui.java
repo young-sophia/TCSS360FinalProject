@@ -7,10 +7,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.Objects;
 
 import static Model.UserFunctionality.Difficulty;
+import static Model.UserFunctionality.getQuestionString;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 /**
  * GUI class and main method for program
@@ -18,18 +19,19 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
  * @author Sophia Young
  */
 public class gui {
-    //static Maze myMaze;
-    //static Player myPlayer;
     static Clip myClip;
     static JFrame myGameFrame;
     static JPanel myGamePanel;
+
+    static MyJLabel healthNum;
+    static int health;
 
     public static void main(String[] theArgs) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         ImageFrame frame = new ImageFrame();
         JButton newGame = new JButton("New Game");
         JButton loadGame = new JButton("Load Game");
         JButton exit = new JButton("Exit");
-
+        //start new game with difficulty selection
         newGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -39,12 +41,10 @@ public class gui {
                 JButton easy = new JButton("Easy");
                 JButton medium = new JButton("Medium");
                 JButton hard = new JButton("Hard");
-                JButton extreme = new JButton("Extreme");
                 frame.setButton(select);
                 frame.setButton(easy);
                 frame.setButton(medium);
                 frame.setButton(hard);
-                frame.setButton(extreme);
                 easy.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -66,22 +66,18 @@ public class gui {
                         frame.setVisible(false);
                     }
                 });
-                extreme.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        startNewGame(Difficulty.EXTREME);
-                        frame.setVisible(false);
-                    }
-                });
             }
         });
+        //load previously saved game
         loadGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //loadLastGame();
+                UserFunctionality.loadLastGame();
+                startNewGame(UserFunctionality.getMaze().getDiff());
                 frame.setVisible(false);
             }
         });
+        //close program
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -93,39 +89,18 @@ public class gui {
         frame.setButton(loadGame);
         frame.setButton(exit);
     }
-    /*
-    private static void saveGame() {
-        try {
-            FileOutputStream fout = new FileOutputStream("f.txt");
-            ObjectOutputStream out=new ObjectOutputStream(fout);
-            myMaze.saveMaze(out);
-            //myPlayer.savePlayer(out);
-            System.out.println("game saved");
-        } catch(Exception ex){System.out.println("error saving");}
-    }
-    private static void loadLastGame() {
-        try{
-            ObjectInputStream in=new ObjectInputStream(new FileInputStream("f.txt"));
-            myMaze = new Maze(5, 5);
-            myMaze.loadMaze(in);
-            //myPlayer = new Player(5);
-            //myPlayer.loadPlayer(in);
-            in.close();
-            startNewGame(myMaze.getDiff());
-        }catch(Exception e){System.out.println(e);}
-    }
-
+    /**
+     * plays audio file as background music
      */
-
     private static void playMusic() {
         try {
             File music = new File("src/Assets/City Blocks - TrackTribe.wav");
             if(music.exists()) {
                 AudioInputStream audioInput = AudioSystem.getAudioInputStream(music);
                 myClip = AudioSystem.getClip();
-                //myClip.open(audioInput);
-                //myClip.start();
-                //myClip.loop(Clip.LOOP_CONTINUOUSLY);
+                myClip.open(audioInput);
+                myClip.start();
+                myClip.loop(Clip.LOOP_CONTINUOUSLY);
             } else {
                 System.out.println("error");
             }
@@ -133,6 +108,9 @@ public class gui {
             throw new RuntimeException(e);
         }
     }
+    /**
+     * allows user to mute/ unmute background audio
+     */
     private static void muteUnmute() {
         if(myClip.isActive()) {
             myClip.stop();
@@ -141,18 +119,22 @@ public class gui {
         }
     }
 
+    /**
+     * starts new game with a given difficulty
+     *
+     * @param diff the difficulty of the new game
+     */
     static void startNewGame(Difficulty diff) {
         myGameFrame = new JFrame("Animal Trivia Maze");
-        myGameFrame.setLayout(new GridBagLayout());
-        myGameFrame.setLocation(360,100);
-        myGameFrame.setSize(800, 600);
+        myGameFrame.setLayout(new FlowLayout());
+        myGameFrame.setSize(900, 600);
         myGameFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         myGamePanel = new JPanel();
         myGamePanel.setLayout(new GridLayout(11, 11));
 
         JPanel controlsPanel = new JPanel();
-        controlsPanel.setLayout(new GridLayout(3, 3));
+        controlsPanel.setLayout(new GridLayout(5, 3));
         setupControlPanel(controlsPanel);
         if(UserFunctionality.getMaze() == null) {
             UserFunctionality.createMaze();
@@ -164,16 +146,28 @@ public class gui {
         myGameFrame.add(controlsPanel);
         myGameFrame.setVisible(true);
     }
+    /**
+     * creates panel of buttons that allow for user controls and options
+     *
+     * @param thePanel the JPanel of buttons to add to the frame
+     */
     static void setupControlPanel(JPanel thePanel) {
         JButton up = new JButton();
         JButton down = new JButton();
         JButton left = new JButton();
         JButton right = new JButton();
-        JButton save = new JButton("Save");
-        JButton load = new JButton("Load");
-        JButton mute = new JButton("Mute");
+        MyJButton save = new MyJButton("Save");
+        MyJButton load = new MyJButton("Load");
+        MyJButton exit = new MyJButton("Exit");
+        MyJButton mute = new MyJButton("Mute");
+        MyJButton inst = new MyJButton("Help");
+        MyJButton about = new MyJButton("About");
         JLabel blank = new JLabel(new ImageIcon("src/Assets/blank.jpg"));
         JLabel blank2 = new JLabel(new ImageIcon("src/Assets/blank.jpg"));
+        JLabel blank3 = new JLabel(new ImageIcon("src/Assets/blank.jpg"));
+        MyJLabel healthLabel = new MyJLabel("Health: ");
+        healthNum = new MyJLabel("5");
+        health = 5;
         up.setIcon(new ImageIcon("src/Assets/arrowUp.jpg"));
         up.setMargin(new Insets(0, 0, 0, 0));
         up.setBorder(null);
@@ -225,21 +219,38 @@ public class gui {
         save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //saveGame();
+                UserFunctionality.saveGame();
             }
         });
         load.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                myGameFrame.setVisible(false);
-                //loadLastGame();
-
+                UserFunctionality.loadLastGame();
+                drawMaze();
+            }
+        });
+        exit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(1);
             }
         });
         mute.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 muteUnmute();
+            }
+        });
+        inst.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Click the arrows to move");
+            }
+        });
+        about.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Animal Trivia Game");
             }
         });
         thePanel.add(blank);
@@ -250,13 +261,33 @@ public class gui {
         thePanel.add(right);
         thePanel.add(save);
         thePanel.add(load);
+        thePanel.add(exit);
         thePanel.add(mute);
+        thePanel.add(inst);
+        thePanel.add(about);
+        thePanel.add(healthLabel);
+        thePanel.add(blank3);
+        thePanel.add(healthNum);
     }
-
+    /**
+     * checks if player can move a given direction
+     * then displays question if there is one
+     * then calls for the updated maze to be drawn
+     *
+     * @param theDirection
+     */
     private static void updatePlayerPos(char theDirection) {
-        String givenAns = JOptionPane.showInputDialog(UserFunctionality.getQuestionString());
-        while(!UserFunctionality.checkAnswer(givenAns)) {
-                givenAns = JOptionPane.showInputDialog(UserFunctionality.getMyQuestionString());
+        System.out.println(theDirection);
+        if(UserFunctionality.getQuestionString(theDirection) != null || Objects.equals(getQuestionString(theDirection), "")) {
+            System.out.println(getQuestionString(theDirection));
+            String givenAns = JOptionPane.showInputDialog(UserFunctionality.getQuestionString(theDirection));
+            while (!UserFunctionality.checkAnswer(givenAns, theDirection)) {
+                health--;
+                healthNum.setText(String.valueOf(health));
+                healthNum.validate();
+                givenAns = JOptionPane.showInputDialog(UserFunctionality.getQuestionString(theDirection));
+
+            }
         }
         boolean moveOK = UserFunctionality.chooseDirectionGUI(theDirection);
         if (!moveOK) {
@@ -265,7 +296,10 @@ public class gui {
         }
         drawMaze();
     }
-
+    /**
+     * draws the maze from a 2D array with images
+     * corresponding to the different letters in the array
+     */
     static void drawMaze() {
         myGamePanel.removeAll();
         for (int i = 0; i < UserFunctionality.getMaze().getRows(); i++) {
@@ -280,7 +314,7 @@ public class gui {
                             ("src/Assets/room.jpg"));
                 } else if (room == 'D') {
                     background = new JLabel(new ImageIcon
-                            ("src/Assets/doorTEMP.jpg"));
+                            ("src/Assets/door.jpg"));
                 } else if (room == 'E') {
                     background = new JLabel(new ImageIcon
                             ("src/Assets/exit.jpg"));
@@ -288,7 +322,7 @@ public class gui {
                     background = new JLabel(new ImageIcon
                             ("src/Assets/enter.jpg"));
                 } else if (room == 'P') {
-                    background = new JLabel(new ImageIcon("src/Assets/pingspam.jpg"));
+                    background = new JLabel(new ImageIcon("src/Assets/player.jpg"));
                 } else {
                     background = new JLabel(new ImageIcon
                             ("src/Assets/wall.jpg"));

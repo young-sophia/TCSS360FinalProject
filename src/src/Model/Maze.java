@@ -1,8 +1,6 @@
 package Model;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +8,8 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 public class Maze implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Room[][] myMaze;
     private int myRows;
     private int myColumns;
@@ -23,7 +23,8 @@ public class Maze implements Serializable {
     private String[] choice;
     private int rand;
     SQLQuestions questions;
-
+    Door myDoor;
+    String myQuestion;
 
     public Maze(final int theRows, final int theColumns){
         myRows = theRows;
@@ -31,32 +32,6 @@ public class Maze implements Serializable {
         myMaze = new Room[theRows][theColumns];
         setBlankMaze(theRows, theColumns);
     }
-
-    public void saveMaze(ObjectOutputStream theOut) throws IOException {
-        theOut.writeObject(myMaze);
-        theOut.writeObject(myRows);
-        theOut.writeObject(myColumns);
-        theOut.writeObject(myArrayMaze);
-        theOut.writeObject(myDiff);
-        theOut.writeObject(mySpawnColMaze);
-        theOut.writeObject(mySpawnRowMaze);
-        theOut.writeObject(mySpawnColLargeMaze);
-        theOut.writeObject(mySpawnRowLargeMaze);
-        theOut.flush();
-        theOut.close();
-    }
-    public void loadMaze(ObjectInputStream theIn) throws IOException, ClassNotFoundException {
-        myMaze = (Room[][]) theIn.readObject();
-        myRows = (int) theIn.readObject();
-        myColumns = (int) theIn.readObject();
-        myArrayMaze = (char[][]) theIn.readObject();
-        myDiff = (UserFunctionality.Difficulty) theIn.readObject();
-        mySpawnColMaze = (int) theIn.readObject();
-        mySpawnRowMaze = (int) theIn.readObject();
-        mySpawnColLargeMaze = (int) theIn.readObject();
-        mySpawnRowLargeMaze = (int) theIn.readObject();
-    }
-
     public char getRoomType(int i, int j) {
         return myArrayMaze[i][j];
     }
@@ -69,29 +44,22 @@ public class Maze implements Serializable {
     public int getColumns() {
         return myArrayMaze.length;
     }
-
     public void setDiff(UserFunctionality.Difficulty theDiff) {
         myDiff = theDiff;
     }
-
 
     public String getQuestion(){
         rand = questions.getRandomvalue();
         String question = questions.getQuestion(rand);
         return question;
     }
-
     public String getAnswer(){
         String answer = questions.getAnswer(rand);
         return answer;
-
     }
-
     public int getQuestionType() {
-        return questions.getType(rand);
+        return myDoor.getMyType();
     }
-
-
     public void setQuestion() {
         int random;
         questions = new SQLQuestions();
@@ -100,33 +68,32 @@ public class Maze implements Serializable {
             for (int j = 0; j < myColumns; j++) {
                 Random ran = new Random();
                 random = ran.nextInt(2)+1;
-
                 if (random == 1) {
                     if (!myMaze[i][j].isNorthWall()) {
-                        Door door = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
-                        myMaze[i][j].setMyQuestionNorth(door);
+                        myDoor = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
+                        myMaze[i][j].setMyQuestionNorth(myDoor);
                         questions.removeQuestion(rand);
                         if(questions.questionList.size() == 0){
                             break outer;
                         }
                     } if (!myMaze[i][j].isWestWall()) {
-                        Door door = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
-                        myMaze[i][j].setMyQuestionWest(door);
+                        myDoor = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
+                        myMaze[i][j].setMyQuestionWest(myDoor);
                         questions.removeQuestion(rand);
 
                         if(questions.questionList.size() == 0){
                             break outer;
                         }
                     } if (!myMaze[i][j].isSouthWall()) {
-                        Door door = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
-                        myMaze[i][j].setMyQuestionSouth(door);
+                        myDoor = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
+                        myMaze[i][j].setMyQuestionSouth(myDoor);
                         questions.removeQuestion(rand);
                         if(questions.questionList.size() == 0){
                             break outer;
                         }
                     } if (!myMaze[i][j].isEastWall()) {
-                        Door door = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
-                        myMaze[i][j].setMyQuestionEast(door);
+                        myDoor = new Door(getQuestion(), getAnswer(),true,checkTypeQuestion(), false);
+                        myMaze[i][j].setMyQuestionEast(myDoor);
                         questions.removeQuestion(rand);
                         if(questions.questionList.size() == 0){
                             break outer;
@@ -135,7 +102,6 @@ public class Maze implements Serializable {
                 }
             }
         }
-        //put in question
     }
     private void setExit(){
         /*
@@ -176,7 +142,6 @@ public class Maze implements Serializable {
         return dist;
 
     }
-
     private void setBlankMaze(int theRows, int theColumns){
         for(int i = 0; i < theRows; i++){
             for(int j = 0; j < theColumns; j++){
@@ -185,8 +150,6 @@ public class Maze implements Serializable {
             }
         }
     }
-
-
     public int[] checkNeighbors(int x, int y){
         int[] arr = new int[4];
         int counter = 0;
@@ -229,9 +192,6 @@ public class Maze implements Serializable {
         return arr;
         //return array [0,-1,2,-1] containing directions valid.
     }
-
-
-
     public int convertArray(int[] arr){
         int spot = 0;
         int direction = -1;
@@ -243,9 +203,7 @@ public class Maze implements Serializable {
                 arr2[spot] = arr[i];
                 spot++;
             }
-            //arr2 = 0,2
         }
-        //2
         int rand = (int) (Math.random()*counter);// 0 to 1.
         if(rand == 0){
             direction = arr2[0];
@@ -262,7 +220,6 @@ public class Maze implements Serializable {
 
         return direction;
     }
-
     //This method picks random direction and checks if it is valid. If direction is valid return that int val, else
     // return -1 saying all neighbors visited.
     public int chooseDirection(int x, int y, int[] arr){
@@ -277,9 +234,7 @@ public class Maze implements Serializable {
         if(direction == 0 ){
             if(myMaze[x][y].getDirectionNorth()){
                 result = 0;
-            }
-            else{
-                //1 to 3
+            } else{
                 System.out.println("ERROR!!!!!!!!!!!!!!!!");
                 direction = (int) (Math.random()*3)+1; //1 2 3
             }
@@ -287,35 +242,26 @@ public class Maze implements Serializable {
         if(direction == 1){
             if(myMaze[x][y].getDirectionWest()){
                 result = 1;
-            }
-            else{
+            } else{
                 System.out.println("ERROR!!!!!!!!!!!!!!!!");
-
                 direction = (int) (Math.random()*2)+2; //2 3
             }
         }
         if(direction == 2){
             if(myMaze[x][y].getDirectionSouth()){
                 result = 2;
-            }
-            else{
+            } else{
                 System.out.println("ERROR!!!!!!!!!!!!!!!!");
-
                 direction = 3;
             }
         }
         if(direction == 3){
             if(myMaze[x][y].getDirectionEast()){
                 result = 3;
-            }
-            else{
+            } else{
                 System.out.println("ERROR!!!!!!!!!!!!!!!!");
-
             }
         }
-
-
-
         return result;
     }
     public void generateMaze(){
@@ -330,7 +276,6 @@ public class Maze implements Serializable {
         create(mySpawnRowMaze,mySpawnColMaze);
         setExit();
     }
-
     public void create(int x, int y){
         //check neighbors
         int[] arr = checkNeighbors(x,y);
@@ -380,8 +325,6 @@ public class Maze implements Serializable {
             create(x,y);
         }
     }
-
-
     public void display(){
         for (int i = 0 ; i < myRows; i++){
             for (int j = 0; j < myColumns; j++){
@@ -389,7 +332,6 @@ public class Maze implements Serializable {
             }
         }
     }
-
     public void displayDirections(){
         if(!myMaze[mySpawnRowMaze][mySpawnColMaze].isSouthWall()){
             System.out.println("Move down (D)");
@@ -404,7 +346,6 @@ public class Maze implements Serializable {
             System.out.println("Move Left (L)");
         }
     }
-
     public boolean checkDirectionForUser(char theDirection){
         boolean flag = true;
         String direction = "" + theDirection;
@@ -431,7 +372,6 @@ public class Maze implements Serializable {
             flag = false;
         }
         return flag;
-
     }
     public void convertMazeToLarger(){
         myArrayMaze = new char[myRows*3 -( myRows-1)][myColumns*3 -(myColumns-1)];
@@ -448,8 +388,6 @@ public class Maze implements Serializable {
             //right column
             myArrayMaze[i][myArrayMaze.length-1] = 'W';
         }
-        //
-        //
         int row = 0;
         int col = 0;
         for (int i = 1; row < myRows; i+=2) {
@@ -460,7 +398,6 @@ public class Maze implements Serializable {
                 if(myArrayMaze[i][j] == 'P'){
                     myArrayMaze[i][j] = 'P';
                 }
-
                 if (myMaze[row][col].isNorthWall()) {
                     myArrayMaze[i - 1][j] = 'W';
                 } else {
@@ -494,7 +431,6 @@ public class Maze implements Serializable {
             row++;
 
         }
-
         for(int i = 0; i < myArrayMaze.length; i++){
             for(int j = 0; j < myArrayMaze[i].length; j++){
                 System.out.print(myArrayMaze[i][j] + " ");
@@ -510,7 +446,6 @@ public class Maze implements Serializable {
             return 'C';
         }
     }
-
     public void questionAnswered(char theDirection){
         if(theDirection == 'U'){
             myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionNorth().setMyQuestionAnswered(true);
@@ -525,9 +460,9 @@ public class Maze implements Serializable {
             myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionEast().setMyQuestionAnswered(true);
         }
     }
-
-    public boolean displayQuestion(char theDirection){
+    public Boolean displayQuestion(char theDirection){
         boolean flag = true;
+        //String question = "";
         if(theDirection == 'U'){
             Door door = myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionNorth();
             if(door != null && !door.myQuestionAnswered) {
@@ -538,17 +473,21 @@ public class Maze implements Serializable {
                     correctAnswer = choice[0];
                     Collections.shuffle(Arrays.asList(choice));
                     if (door.questionExist) {
-                        System.out.println(door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
-                                "\nC. " + choice[2] + "\nD. " + choice[3]);
+                        myQuestion = door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
+                                "\nC. " + choice[2] + "\nD. " + choice[3];
                     }
                 }
-                else if(door.getMyType() == 1 || door.getMyType() == 2){
+                else if(door.getMyType() == 1){
                     correctAnswer = door.getAnswer();
                     if(door.questionExist){
-                        System.out.println(door.question);
+                        myQuestion = door.question;
+                    }
+                } else if(door.getMyType() == 2) {
+                    correctAnswer = door.getAnswer();
+                    if(door.questionExist) {
+                        myQuestion = "True or False: " + door.question;
                     }
                 }
-
             }
         }
         else if(theDirection == 'L' ){
@@ -561,16 +500,20 @@ public class Maze implements Serializable {
                     correctAnswer = choice[0];
                     Collections.shuffle(Arrays.asList(choice));
                     if (door.questionExist) {
-                        System.out.println(door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
-                                "\nC. " + choice[2] + "\nD. " + choice[3]);
+                        myQuestion = door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
+                                "\nC. " + choice[2] + "\nD. " + choice[3];
                     }
                 }
-                else if(door.getMyType() == 1 || door.getMyType() == 2){
+                else if(door.getMyType() == 1){
                     correctAnswer = door.getAnswer();
                     if(door.questionExist){
-                        System.out.println(door.question);
+                        myQuestion = door.question;
                     }
-
+                } else if(door.getMyType() == 2) {
+                    correctAnswer = door.getAnswer();
+                    if (door.questionExist) {
+                        myQuestion = "True or False: " + door.question;
+                    }
                 }
             }
         }
@@ -584,16 +527,20 @@ public class Maze implements Serializable {
                     correctAnswer = choice[0];
                     Collections.shuffle(Arrays.asList(choice));
                     if (door.questionExist) {
-                        System.out.println(door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
-                                "\nC. " + choice[2] + "\nD. " + choice[3]);
+                        myQuestion = door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
+                                "\nC. " + choice[2] + "\nD. " + choice[3];
                     }
                 }
-                else if(door.getMyType() == 1 || door.getMyType() == 2){
+                else if(door.getMyType() == 1){
                     correctAnswer = door.getAnswer();
                     if(door.questionExist){
-                        System.out.println(door.question);
+                        myQuestion = door.question;
                     }
-
+                } else if(door.getMyType() == 2) {
+                    correctAnswer = door.getAnswer();
+                    if (door.questionExist) {
+                        myQuestion = "True or False: " + door.question;
+                    }
                 }
             }
         }
@@ -607,22 +554,32 @@ public class Maze implements Serializable {
                     correctAnswer = choice[0];
                     Collections.shuffle(Arrays.asList(choice));
                     if (door.questionExist) {
-                        System.out.println(door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
-                                "\nC. " + choice[2] + "\nD. " + choice[3]);
+                        myQuestion = door.question + "\n\nA. " + choice[0] + "\nB. " + choice[1] +
+                                "\nC. " + choice[2] + "\nD. " + choice[3];
                     }
                 }
-                else if(door.getMyType() == 1 || door.getMyType() == 2){
+                else if(door.getMyType() == 1){
                     correctAnswer = door.getAnswer();
                     if(door.questionExist){
-                        System.out.println(door.question);
+                        myQuestion = door.question;
                     }
-
+                } else if(door.getMyType() == 2) {
+                    correctAnswer = door.getAnswer();
+                    if(door.questionExist) {
+                        myQuestion = "True or False: " + door.question;
+                    }
                 }
             }
         }
         return flag;
     }
-
+    public String getCorrectAnswer() {
+        System.out.println(correctAnswer);
+        return correctAnswer;
+    }
+    public String getMyQuestion() {
+        return myQuestion;
+    }
     public int checkTypeQuestion(){
         if(questions.getType(rand) == 0){
             return 0;
@@ -634,7 +591,6 @@ public class Maze implements Serializable {
             return 2;
         }
     }
-
     public int checkTypeQuestionMaze(char theDirecton) {
         if (theDirecton == 'U') {
             if (myMaze[mySpawnRowMaze][mySpawnColMaze].getMyQuestionNorth().myType == 0) {
@@ -670,7 +626,6 @@ public class Maze implements Serializable {
             }
         }
     }
-
     public boolean shortAnswer(String theInput){
         boolean flag = true;
         if(!theInput.equalsIgnoreCase(correctAnswer)){
@@ -679,8 +634,6 @@ public class Maze implements Serializable {
         }
         return flag;
     }
-
-
     public boolean answerMultipleChoice(char theAnswer){
         boolean flag = true;
         if(theAnswer == 'A'){
@@ -708,7 +661,6 @@ public class Maze implements Serializable {
             }
         }
         return flag;
-
     }
     public void movePlayer(char theDirection){
         if(theDirection == 'R'){
@@ -719,7 +671,6 @@ public class Maze implements Serializable {
             myMaze[mySpawnRowMaze][mySpawnColMaze+1].setMySpawn(true);
             mySpawnColMaze+=1;
             mySpawnColLargeMaze +=2;
-//            System.out.println("Updated");
         }
         else if(theDirection == 'L'){
             myArrayMaze[mySpawnRowLargeMaze][mySpawnColLargeMaze] = 'R';
@@ -729,7 +680,6 @@ public class Maze implements Serializable {
             myMaze[mySpawnRowMaze][mySpawnColMaze-1].setMySpawn(true);
             mySpawnColMaze-=1;
             mySpawnColLargeMaze -=2;
-//            System.out.println("Updated");
         }
         else if(theDirection == 'D'){
             myArrayMaze[mySpawnRowLargeMaze][mySpawnColLargeMaze] = 'R';
@@ -739,7 +689,6 @@ public class Maze implements Serializable {
             myMaze[mySpawnRowMaze+1][mySpawnColMaze].setMySpawn(true);
             mySpawnRowMaze+=1;
             mySpawnRowLargeMaze +=2;
-//            System.out.println("Updated");
         }
         else if(theDirection == 'U'){
             myArrayMaze[mySpawnRowLargeMaze][mySpawnColLargeMaze] = 'R';
@@ -749,7 +698,6 @@ public class Maze implements Serializable {
             myMaze[mySpawnRowMaze-1][mySpawnColMaze].setMySpawn(true);
             mySpawnRowMaze-=1;
             mySpawnRowLargeMaze -=2;
-//            System.out.println("Updated");
         }
     }
 }
